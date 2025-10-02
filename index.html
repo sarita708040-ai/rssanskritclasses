@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rs Sanskrit Classes - Learn Sanskrit Online</title>
+<style>
+/* Reset & base */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:"Segoe UI", Arial, sans-serif; line-height:1.6; background:#f4f5f9; color:#222; scroll-behavior:smooth; overflow-x:hidden; }
+
+/* Loader */
+#loader { position:fixed;width:100%;height:100%;background:white;display:flex;justify-content:center;align-items:center;z-index:9999; }
+.spinner { border:6px solid #ddd; border-top:6px solid #673ab7; border-radius:50%; width:60px;height:60px; animation:spin 1s linear infinite; }
+@keyframes spin { 100%{transform:rotate(360deg);} }
+
+/* Hero */
+header { background: linear-gradient(rgba(74,20,140,0.7), rgba(126,87,194,0.7)), url('https://images.unsplash.com/photo-1524492449090-6d2dba8f9c19?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover; color:white; text-align:center; padding:120px 20px 80px; opacity:0; transform:translateY(20px); transition:1s; }
+header.show { opacity:1; transform:translateY(0); }
+header h1 { font-size:48px; margin-bottom:10px; }
+header p { font-size:20px; opacity:0.9; margin-bottom:20px; }
+.hero-btn { padding:15px 30px; background:#ff3b30; color:white; font-weight:bold; border-radius:10px; text-decoration:none; transition:0.3s; }
+.hero-btn:hover { background:#ff6b3a; transform:scale(1.05); }
+
+/* Navigation */
+nav { display:flex; justify-content:center; gap:30px; background:#512da8; padding:14px; position:sticky; top:0; z-index:10; }
+nav a { color:white; text-decoration:none; font-weight:500; transition:0.3s; }
+nav a:hover { color:#ffd54f; }
+
+/* Container & Cards */
+.container { max-width:1100px; margin:40px auto; padding:0 20px; }
+.card { background:white; padding:30px; margin-bottom:30px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.08); opacity:0; transform:translateY(20px); transition:0.8s; }
+.card.show { opacity:1; transform:translateY(0); }
+h2 { color:#673ab7; margin-bottom:15px; }
+
+/* Buttons */
+.btn { display:inline-block; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:600; background:linear-gradient(90deg,#ff3b30,#ff6b3a); color:#fff; transition:transform 0.2s; }
+.btn:hover { transform:scale(1.05); }
+
+/* Videos */
+iframe { width:100%; border-radius:10px; border:none; margin-top:20px; }
+
+/* Features Section */
+.features { display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:20px; }
+.feature-card { background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); text-align:center; transition:0.3s; opacity:0; transform:translateY(20px); }
+.feature-card.show { opacity:1; transform:translateY(0); }
+.feature-card:hover { transform:translateY(-5px); box-shadow:0 12px 28px rgba(0,0,0,0.12); }
+.feature-card img { width:60px; margin-bottom:15px; }
+
+/* Testimonials */
+.testimonials { display:grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+.testimonial { background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); font-style:italic; transition:0.3s; opacity:0; transform:translateY(20px);}
+.testimonial.show { opacity:1; transform:translateY(0);}
+.testimonial:hover { transform:translateY(-5px); box-shadow:0 12px 28px rgba(0,0,0,0.12); }
+
+/* Contact Form */
+form input, form textarea { width:100%; padding:12px; margin:10px 0; border:1px solid #ccc; border-radius:8px; font-size:15px; }
+form input:focus, form textarea:focus { border-color:#673ab7; outline:none; }
+form button { background:#673ab7; color:white; padding:12px 20px; border:none; border-radius:8px; cursor:pointer; font-size:16px; font-weight:bold; transition:0.3s; }
+form button:hover { background:#512da8; }
+#welcomeMessage { margin-top:15px; font-weight:bold; color:green; }
+#studentList { list-style:none; padding-left:0; }
+
+/* Footer */
+footer { text-align:center; background:#673ab7; color:white; padding:25px 20px; margin-top:40px; }
+footer a { color:#ffd54f; text-decoration:none; }
+footer a:hover { text-decoration:underline; }
+
+/* Daily Word */
+#dailyWord { text-align:center; padding:20px; background:#e8eaf6; border-radius:12px; margin-bottom:30px; opacity:0; transform:translateY(20px); transition:0.8s;}
+#dailyWord.show { opacity:1; transform:translateY(0);}
+#dailyWord span { font-weight:bold; color:#673ab7; }
+
+/* Counters */
+.counters { display:flex; justify-content:space-around; flex-wrap:wrap; gap:20px; text-align:center; margin-bottom:30px; }
+.counter { background:#fff; padding:20px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.08); flex:1; min-width:150px; opacity:0; transform:translateY(20px); transition:0.8s; }
+.counter.show { opacity:1; transform:translateY(0); }
+.counter h3 { font-size:28px; color:#ff3b30; margin-bottom:10px; }
+
+/* Responsive */
+@media(max-width:768px){ header h1 { font-size:32px; } }
+</style>
+</head>
+<body>
+
+<!-- Loader -->
+<div id="loader"><div class="spinner"></div></div>
+
+<header id="hero">
+  <h1>Rs Sanskrit Classes</h1>
+  <p>Learn Sanskrit the smart & simple way</p>
+  <a class="hero-btn" href="#videos">Start Learning</a>
+</header>
+
+<nav>
+  <a href="#about">About</a>
+  <a href="#videos">Videos</a>
+  <a href="#features">Features</a>
+  <a href="#dailyWord">Daily Word</a>
+  <a href="#counters">Stats</a>
+  <a href="#testimonials">Testimonials</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<div class="container">
+
+  <!-- About -->
+  <div class="card" id="about">
+    <h2>About Us</h2>
+    <p>Rs Sanskrit Classes provides structured, fun, and interactive lessons for students to learn Sanskrit easily. 
+       Explore grammar, pronunciation, short stories, and more, designed for beginners and school students.</p>
+  </div>
+
+  <!-- Videos -->
+  <div class="card" id="videos">
+    <h2>Watch Our Lessons</h2>
+    <p>Explore our YouTube channel for structured Sanskrit learning content.</p>
+    <a class="btn" href="https://www.youtube.com/@rssanskritclasses" target="_blank">Visit YouTube Channel</a>
+    <iframe height="315" src="https://www.youtube.com/embed?listType=playlist&list=PLIv7MJieZ_Ma0-sML9CVENNW2Bk26dhJL" allowfullscreen></iframe>
+  </div>
+
+  <!-- Features -->
+  <div class="card" id="features">
+    <h2>Why Learn With Us?</h2>
+    <div class="features">
+      <div class="feature-card"><img src="https://img.icons8.com/ios-filled/50/673ab7/book.png"/><p>Interactive Lessons</p></div>
+      <div class="feature-card"><img src="https://img.icons8.com/ios-filled/50/673ab7/teacher.png"/><p>Expert Guidance</p></div>
+      <div class="feature-card"><img src="https://img.icons8.com/ios-filled/50/673ab7/video.png"/><p>Video Tutorials</p></div>
+      <div class="feature-card"><img src="https://img.icons8.com/ios-filled/50/673ab7/medal.png"/><p>Certificates</p></div>
+    </div>
+  </div>
+
+  <!-- Daily Word -->
+  <div class="card" id="dailyWord">
+    <h2>Daily Sanskrit Word</h2>
+    <p><span id="word"></span> - <span id="meaning"></span></p>
+  </div>
+
+  <!-- Counters -->
+  <div class="card" id="counters">
+    <div class="counters">
+      <div class="counter"><h3>100+</h3><p>Students Learned</p></div>
+      <div class="counter"><h3>150+</h3><p>Videos Uploaded</p></div>
+      <div class="counter"><h3>10+</h3><p>Certificates Issued</p></div>
+    </div>
+  </div>
+
+  <!-- Testimonials -->
+  <div class="card" id="testimonials">
+    <h2>Student Reviews</h2>
+    <div class="testimonials">
+      <div class="testimonial">"Amazing teaching! I understood Sanskrit in weeks." - Ananya</div>
+      <div class="testimonial">"Lessons are simple and fun. Highly recommended!" - Rahul</div>
+      <div class="testimonial">"The YouTube tutorials are very detailed and easy to follow." - Priya</div>
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <div class="card" id="contact">
+    <h2>Contact Us</h2>
+    <p>📧 Email: <a href="mailto:ram96700@gmail.com">ram96700@gmail.com</a></p>
+    <p>📱 Phone: +91-9670097416</p>
+    <form id="contactForm">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="email" id="email" placeholder="Your Email" required>
+      <textarea id="message" rows="4" placeholder="Your Message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+    <p id="welcomeMessage"></p>
+    <h3>Students Who Contacted Us:</h3>
+    <ul id="studentList"></ul>
+  </div>
+
+</div>
+
+<footer>
+  <p>&copy; 2025 Rs Sanskrit Classes | All Rights Reserved</p>
+  <p>Follow us on <a href="https://www.youtube.com/@rssanskritclasses" target="_blank">YouTube</a></p>
+</footer>
+
+<script>
+// Loader
+window.addEventListener("load", function(){
+  document.getElementById("loader").style.display = "none";
+  document.getElementById("hero").classList.add("show");
+
+  // Animate cards on scroll
+  const elements = document.querySelectorAll('.card, .feature-card, .testimonial, #dailyWord, .counter');
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){ entry.target.classList.add('show'); }
+    });
+  }, { threshold:0.2 });
+  elements.forEach(el=>observer.observe(el));
+
+  // Load student list
+  loadStudents();
+
+  // Show welcome message if previously submitted
+  const savedName = localStorage.getItem("visitorName");
+  if(savedName){
+    document.getElementById("welcomeMessage").textContent =
+      "Welcome back, "+savedName+"! Thanks for contacting us earlier.";
+  }
+
+  // Daily Sanskrit Word
+  const words = [
+    { word: "नमस्ते", meaning: "Hello / Greetings" },
+    { word: "धन्यवाद", meaning: "Thank You" },
+    { word: "शुभप्रभात", meaning: "Good Morning" },
+    { word: "शुभरात्रि", meaning: "Good Night" },
+    { word: "सुखम्", meaning: "Happiness / Well-being" },
+    { word: "ज्ञानम्", meaning: "Knowledge" },
+    { word: "शांति", meaning: "Peace" },
+    { word: "सर्वेभ्यः", meaning: "To Everyone" },
+    { word: "मित्र", meaning: "Friend" },
+    { word: "शिक्षा", meaning: "Education" }
+  ];
+  const today = new Date();
+  const index = today.getDate() % words.length;
+  document.getElementById("word").textContent = words[index].word;
+  document.getElementById("meaning").textContent = words[index].meaning;
+});
+
+// Contact Form & Students List
+function loadStudents() {
+  const studentList = document.getElementById("studentList");
+  studentList.innerHTML = "";
+  let students = JSON.parse(localStorage.getItem("students")) || [];
+  students.forEach(s => {
+    const li = document.createElement("li");
+    li.textContent = `${s.name} (${s.email}): ${s.message}`;
+    studentList.appendChild(li);
+  });
+}
+
+document.getElementById("contactForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const message = document.getElementById("message").value;
+
+  let students = JSON.parse(localStorage.getItem("students")) || [];
+  students.push({ name, email, message });
+  localStorage.setItem("students", JSON.stringify(students));
+  localStorage.setItem("visitorName", name);
+
+  document.getElementById("welcomeMessage").textContent =
+    `Thank you, ${name}! Your message has been received.`;
+
+  this.reset();
+  loadStudents();
+});
+</script>
+
+</body>
+</html>

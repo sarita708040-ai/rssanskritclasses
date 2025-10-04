@@ -1,1 +1,280 @@
-<!DOCTYPE html> <html lang="sa"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>संस्कृत प्रो क्विज़</title> <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet"> <style> body { font-family: 'Noto Sans Devanagari', sans-serif; margin:0; background: linear-gradient(135deg,#f6d365,#fda085); display:flex; justify-content:center; align-items:center; min-height:100vh; overflow-x:hidden; } .container { background:#fff; border-radius:20px; max-width:600px; width:90%; padding:30px; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.3); animation:fadeIn 1s ease; position:relative; } h1 { margin-bottom:10px; color:#333; } .progress-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; } .progress-text { font-weight:bold; } .progress-bar { height:12px; background:#eee; border-radius:6px; flex:1; margin-left:10px; overflow:hidden;} .progress { height:100%; background:#f6d365; width:0%; transition:width 0.5s;} #timer { font-weight:bold; font-size:1.2rem; color:#333; margin-bottom:15px; } .question-card { background:#fff8dc; padding:25px; border-radius:15px; font-size:1.25rem; min-height:100px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; transition: transform 0.3s, background 0.3s; } .question-card.animate { transform: scale(1.05); } .options { display:grid; grid-template-columns:1fr 1fr; gap:10px; } .options button { padding:15px; font-size:1rem; border:none; border-radius:10px; cursor:pointer; background:#ffe4b5; transition:0.3s transform, 0.3s background; } .options button:hover { transform: scale(1.05); background:#ffd27f; } .options button.correct { background:#90ee90; } .options button.wrong { background:#ff7f7f; } #nextBtn { margin-top:15px; padding:10px 20px; font-size:1rem; border:none; border-radius:10px; background:#f6d365; cursor:pointer; transition:0.3s; display:none;} #nextBtn:hover { transform: scale(1.05); background:#fda085; } #scoreContainer { font-size:1.5rem; margin-top:20px; display:none; } .restartBtn, .shareBtn, .viewBtn { margin-top:15px; padding:10px 15px; border:none; border-radius:10px; cursor:pointer; background:#f6d365; transition:0.3s; margin-right:10px;} .restartBtn:hover, .shareBtn:hover, .viewBtn:hover { transform: scale(1.05); background:#fda085; } .review-container { display:none; margin-top:20px; text-align:left; max-height:300px; overflow-y:auto; padding:10px; border:1px solid #ccc; border-radius:10px; background:#fefbd8; } .review-container h3 { font-size:1rem; margin-bottom:5px; } @keyframes fadeIn { from {opacity:0;} to {opacity:1;} } @media(max-width:500px){ .options{ grid-template-columns:1fr; } } .confetti { position:absolute; width:10px; height:10px; background:gold; top:0; left:50%; opacity:1; pointer-events:none; animation:fall 2s linear forwards; border-radius:50%; } @keyframes fall { 0% {transform:translateY(0) rotate(0deg);} 100% {transform:translateY(500px) rotate(360deg); opacity:0;} } .start-screen { text-align:center; } .start-screen h2 { margin-bottom:20px; } .startBtn { padding:12px 20px; border:none; border-radius:10px; cursor:pointer; background:#f6d365; font-size:1.1rem; } .startBtn:hover { transform: scale(1.05); background:#fda085; } </style> </head> <body> <div class="container"> <!-- Start Screen --> <div id="startScreen" class="start-screen"> <h2>संस्कृत प्रो क्विज़ में आपका स्वागत है!</h2> <button class="startBtn" onclick="startQuiz()">शुरू करें</button> </div> <!-- Quiz Section --> <div id="quizContainer" style="display:none;"> <h1>संस्कृत प्रो क्विज़</h1> <div class="progress-container"> <div class="progress-text" id="progressText">प्रश्न 1 / 10</div> <div class="progress-bar"><div class="progress" id="progress"></div></div> </div> <div id="timer">30</div> <div id="quiz"> <div class="question-card" id="question"></div> <div class="options"> <button id="option0"></button> <button id="option1"></button> <button id="option2"></button> <button id="option3"></button> </div> <button id="nextBtn">अगला प्रश्न</button> </div> <div id="scoreContainer"> <p id="finalScore"></p> <button class="restartBtn" onclick="restartQuiz()">पुनः प्रारंभ करें</button> <button class="shareBtn" onclick="shareScore()">अपना अंक साझा करें</button> <button class="viewBtn" onclick="viewAnswers()">उत्तर देखें</button> <div class="review-container" id="reviewContainer"></div> </div> </div> </div> <script> // ===== Sounds ===== const correctSound=new Audio("https://www.myinstants.com/media/sounds/correct.mp3"); const wrongSound=new Audio("https://www.myinstants.com/media/sounds/wrong.mp3"); // ===== Questions ===== const allQuestions = [ ["सूर्यस्य वर्णः कः?", "नील", "हरित", "पीत", "लोहित", "पीत"], ["भारतस्य राजधानी किम्?", "दिल्ली", "कोलकाता", "चेन्नई", "मुम्बई", "दिल्ली"], ["गुरु का अर्थ कः?", "विद्यार्थी", "शिक्षक", "राष्ट्र", "सखा", "शिक्षक"], ["नदी का संस्कृत नाम?", "झरना", "सरिता", "तालाब", "सागर", "सरिता"], ["पृथ्वी का संस्कृत नाम?", "जल", "भूमि", "अग्नि", "वायु", "भूमि"], ["हंस का संस्कृत नाम?", "सिंह", "हंस", "कुरु", "शशक", "हंस"], ["वायू का अर्थ?", "अग्नि", "हवा", "जल", "पृथ्वी", "हवा"], ["विद्यालया क्या होता?", "अश्रम", "विद्यालय", "गृह", "वन", "विद्यालय"], ["सप्त का अर्थ?", "दो", "तीन", "सात", "चार", "सात"], ["अग्नि का अर्थ?", "जल", "आग", "वायु", "पृथ्वी", "आग"] ]; // ===== Pick Random Questions ===== function pickRandomQuestions(allQuestions,count){ let copy=[...allQuestions], selected=[]; for(let i=0;i<count;i++){ let idx=Math.floor(Math.random()*copy.length); selected.push(copy[idx]); copy.splice(idx,1); } return selected; } let quizQuestions=[]; let currentIndex=0; let score=0; let time=30; let timerInterval; let userAnswers=[]; const questionEl=document.getElementById("question"); const optionsBtns=[...document.querySelectorAll(".options button")]; const nextBtn=document.getElementById("nextBtn"); const scoreContainer=document.getElementById("scoreContainer"); const finalScore=document.getElementById("finalScore"); const progressBar=document.getElementById("progress"); const progressText=document.getElementById("progressText"); const timerEl=document.getElementById("timer"); const reviewContainer=document.getElementById("reviewContainer"); // ===== Start Quiz ===== function startQuiz(){ document.getElementById("startScreen").style.display="none"; document.getElementById("quizContainer").style.display="block"; quizQuestions=pickRandomQuestions(allQuestions,10); currentIndex=0; score=0; userAnswers=[]; showQuestion(); } // ===== Show Question ===== function showQuestion(){ let q=quizQuestions[currentIndex]; questionEl.textContent=q[0]; questionEl.classList.add("animate"); setTimeout(()=>questionEl.classList.remove("animate"),300); for(let i=0;i<4;i++){ optionsBtns[i].textContent=q[i+1]; optionsBtns[i].disabled=false; optionsBtns[i].classList.remove("correct","wrong"); } nextBtn.style.display="none"; progressText.textContent=प्रश्न ${currentIndex+1} / ${quizQuestions.length}; progressBar.style.width=${(currentIndex/quizQuestions.length)*100}%; resetTimer(); } // ===== Timer ===== function resetTimer(){ clearInterval(timerInterval); time=30; timerEl.textContent=time; timerInterval=setInterval(()=>{ time--; timerEl.textContent=time; if(time<=0){ selectCorrect(); } },1000); } // ===== Option Click ===== optionsBtns.forEach(btn=>{ btn.addEventListener("click",(e)=>{ clearInterval(timerInterval); let selected=e.target.textContent; let correct=quizQuestions[currentIndex][5]; userAnswers[currentIndex]=selected; if(selected===correct){ score++; e.target.classList.add("correct"); correctSound.play(); confettiBurst(); } else { e.target.classList.add("wrong"); wrongSound.play(); selectCorrect(); } optionsBtns.forEach(b=>b.disabled=true); nextBtn.style.display="inline-block"; }); }); function selectCorrect(){ let correct=quizQuestions[currentIndex][5]; optionsBtns.forEach(b=>{ if(b.textContent===correct) b.classList.add("correct"); }); optionsBtns.forEach(b=>b.disabled=true); nextBtn.style.display="inline-block"; } // ===== Next Question ===== nextBtn.addEventListener("click",()=>{ currentIndex++; if(currentIndex<quizQuestions.length){ showQuestion(); } else{ showResult(); } }); // ===== Show Result ===== function showResult(){ document.getElementById("quiz").style.display="none"; scoreContainer.style.display="block"; finalScore.textContent=तव अंक: ${score} / ${quizQuestions.length} (${Math.round(score/quizQuestions.length*100)}%); progressBar.style.width=100%; clearInterval(timerInterval); confettiBurst(); } // ===== Restart Quiz ===== function restartQuiz(){ quizQuestions=pickRandomQuestions(allQuestions,10); currentIndex=0; score=0; userAnswers=[]; scoreContainer.style.display="none"; reviewContainer.style.display="none"; document.getElementById("quiz").style.display="block"; showQuestion(); } // ===== Share Score ===== function shareScore(){ if(navigator.share){ navigator.share({title:"संस्कृत प्रो क्विज़", text:मेरा स्कोर: ${score}/10}); } else { alert(मेरा स्कोर: ${score}/10); } } // ===== View Answers ===== function viewAnswers(){ reviewContainer.innerHTML=""; quizQuestions.forEach((q,i)=>{ let user=userAnswers[i]||"कोई उत्तर नहीं"; reviewContainer.innerHTML+=<h3>${i+1}. ${q[0]}</h3> <p>आपका उत्तर: ${user}</p> <p>सही उत्तर: ${q[5]}</p><hr>; }); reviewContainer.style.display="block"; } // ===== Confetti Animation ===== function confettiBurst(){ for(let i=0;i<30;i++){ let c=document.createElement("div"); c.classList.add("confetti"); c.style.left=Math.random()*100+"%"; c.style.background=["#f6d365","#fda085","#ff7f7f","#90ee90","#ffd700"][Math.floor(Math.random()*5)]; document.querySelector(".container").appendChild(c); setTimeout(()=>c.remove(),2000); } } </script> </body> </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rs Sanskrit Classes - Learn Sanskrit Online</title>
+<style>
+/* Reset & base */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:"Segoe UI", Arial, sans-serif; line-height:1.6; background:#f4f5f9; color:#222; scroll-behavior:smooth; overflow-x:hidden; }
+
+/* Loader */
+#loader { position:fixed;width:100%;height:100%;background:white;display:flex;justify-content:center;align-items:center;z-index:9999; }
+.spinner { border:6px solid #ddd; border-top:6px solid #673ab7; border-radius:50%; width:60px;height:60px; animation:spin 1s linear infinite; }
+@keyframes spin { 100%{transform:rotate(360deg);} }
+
+/* Hero */
+header { background: linear-gradient(rgba(74,20,140,0.7), rgba(126,87,194,0.7)), url('https://images.unsplash.com/photo-1524492449090-6d2dba8f9c19?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover; color:white; text-align:center; padding:120px 20px 80px; opacity:0; transform:translateY(20px); transition:1s; }
+header.show { opacity:1; transform:translateY(0); }
+header h1 { font-size:48px; margin-bottom:10px; }
+header p { font-size:20px; opacity:0.9; margin-bottom:20px; }
+.hero-btn { padding:15px 30px; background:#ff3b30; color:white; font-weight:bold; border-radius:10px; text-decoration:none; transition:0.3s; }
+.hero-btn:hover { background:#ff6b3a; transform:scale(1.05); }
+
+/* Navigation */
+nav { display:flex; justify-content:center; gap:30px; background:#512da8; padding:14px; position:sticky; top:0; z-index:10; }
+nav a { color:white; text-decoration:none; font-weight:500; transition:0.3s; }
+nav a:hover { color:#ffd54f; }
+
+/* Container & Cards */
+.container { max-width:1100px; margin:40px auto; padding:0 20px; }
+.card { background:white; padding:30px; margin-bottom:30px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.08); opacity:0; transform:translateY(20px); transition:0.8s; }
+.card.show { opacity:1; transform:translateY(0); }
+h2 { color:#673ab7; margin-bottom:15px; }
+
+/* Buttons */
+.btn { display:inline-block; padding:12px 20px; border-radius:8px; text-decoration:none; font-weight:600; background:linear-gradient(90deg,#ff3b30,#ff6b3a); color:#fff; transition:transform 0.2s; }
+.btn:hover { transform:scale(1.05); }
+
+/* Videos */
+iframe { width:100%; border-radius:10px; border:none; margin-top:20px; }
+
+/* Features Section */
+.features { display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:20px; }
+.feature-card { background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); text-align:center; transition:0.3s; opacity:0; transform:translateY(20px); }
+.feature-card.show { opacity:1; transform:translateY(0); }
+.feature-card:hover { transform:translateY(-5px); box-shadow:0 12px 28px rgba(0,0,0,0.12); }
+.feature-card img { width:60px; margin-bottom:15px; }
+
+/* Testimonials */
+.testimonials { display:grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+.testimonial { background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); font-style:italic; transition:0.3s; opacity:0; transform:translateY(20px);}
+.testimonial.show { opacity:1; transform:translateY(0);}
+.testimonial:hover { transform:translateY(-5px); box-shadow:0 12px 28px rgba(0,0,0,0.12); }
+
+/* Contact Form */
+form input, form textarea { width:100%; padding:12px; margin:10px 0; border:1px solid #ccc; border-radius:8px; font-size:15px; }
+form input:focus, form textarea:focus { border-color:#673ab7; outline:none; }
+form button { background:#673ab7; color:white; padding:12px 20px; border:none; border-radius:8px; cursor:pointer; font-size:16px; font-weight:bold; transition:0.3s; }
+form button:hover { background:#512da8; }
+#welcomeMessage { margin-top:15px; font-weight:bold; color:green; }
+#studentList { list-style:none; padding-left:0; }
+
+/* Footer */
+footer { text-align:center; background:#673ab7; color:white; padding:25px 20px; margin-top:40px; }
+footer a { color:#ffd54f; text-decoration:none; }
+footer a:hover { text-decoration:underline; }
+
+/* Daily Word */
+#dailyWord { text-align:center; padding:20px; background:#e8eaf6; border-radius:12px; margin-bottom:30px; opacity:0; transform:translateY(20px); transition:0.8s;}
+#dailyWord.show { opacity:1; transform:translateY(0);}
+#dailyWord span { font-weight:bold; color:#673ab7; }
+
+/* Counters */
+.counters { display:flex; justify-content:space-around; flex-wrap:wrap; gap:20px; text-align:center; margin-bottom:30px; }
+.counter { background:#fff; padding:20px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.08); flex:1; min-width:150px; opacity:0; transform:translateY(20px); transition:0.8s; }
+.counter.show { opacity:1; transform:translateY(0); }
+.counter h3 { font-size:28px; color:#ff3b30; margin-bottom:10px; }
+
+/* Responsive */
+@media(max-width:768px){ header h1 { font-size:32px; } }
+</style>
+</head>
+<body>
+
+<!-- Loader -->
+<div id="loader"><div class="spinner"></div></div>
+
+<header id="hero">
+  <h1>Rs Sanskrit Classes</h1>
+  <p>Learn Sanskrit the smart & simple way</p>
+  <a class="hero-btn" href="#videos">Start Learning</a>
+</header>
+
+<nav>
+  <a href="#about">About</a>
+  <a href="#videos">Videos</a>
+  <a href="#features">Features</a>
+  <a href="#dailyWord">Daily Word</a>
+  <a href="#counters">Stats</a>
+  <a href="#testimonials">Testimonials</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<div class="container">
+
+  <!-- About -->
+  <div class="card" id="about">
+    <h2>About Us</h2>
+    <p>Rs Sanskrit Classes provides structured, fun, and interactive lessons for students to learn Sanskrit easily. 
+       Explore grammar, pronunciation, short stories, and more, designed for beginners and school students.</p>
+  </div>
+
+  <!-- Videos -->
+  <div class="card" id="videos">
+    <h2>Watch Our Lessons</h2>
+    <p>Explore our YouTube channel for structured Sanskrit learning content.</p>
+    <a class="btn" href="https://www.youtube.com/@rssanskritclasses" target="_blank">Visit YouTube Channel</a>
+    <iframe height="315" src="https://www.youtube.com/embed?listType=playlist&list=PLIv7MJieZ_Ma0-sML9CVENNW2Bk26dhJL" allowfullscreen></iframe>
+  </div>
+
+  <!-- Features -->
+  <div class="card" id="features">
+    <h2>Why Learn With Us?</h2>
+    <div class="features">
+      <div class="feature-card"><img src="https://img.icons8.com/ios-filled/50/673ab7/book.png"/><p>Interactive Lessons</p></div>
+      <div class="feature-card"><img src="https://img.icons8.com/ios-filled/50/673ab7/teacher.png"/><p>Expert Guidance</p></div>
+      <div class="feature-card"><img src="https://img.icons8.com/ios-filled/50/673ab7/video.png"/><p>Video Tutorials</p></div>
+      <div class="feature-card"><img src="https://img.icons8.com/ios-filled/50/673ab7/medal.png"/><p>Certificates</p></div>
+    </div>
+<!-- Colors in Sanskrit -->
+<div class="card" id="colors">
+  <h2>संस्‍कृत में रंग</h2>
+  <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:15px;">
+    <div class="feature-card" style="background:#ff3b30; color:white;"><p>रक्तः<br>लाल</p></div>
+    <div class="feature-card" style="background:#000000; color:white;"><p>श्यामः<br>काला</p></div>
+    <div class="feature-card" style="background:#3f51b5; color:white;"><p>नीलः<br>नीला</p></div>
+    <div class="feature-card" style="background:#4caf50; color:white;"><p>हरितः<br>हरा</p></div>
+    <div class="feature-card" style="background:#ffeb3b; color:#222;"><p>पीतः<br>पीला</p></div>
+    <div class="feature-card" style="background:#ffffff; color:#222; border:1px solid #ccc;"><p>श्वेतः<br>सफ़ेद</p></div>
+    <div class="feature-card" style="background:#ffc0cb; color:#222;"><p>कुमुदः<br>गुलाबी</p></div>
+    <div class="feature-card" style="background:#add8e6; color:#222;"><p>कपोतः<br>हल्का नीला</p></div>
+    <div class="feature-card" style="background:#ff9800; color:white;"><p>नारङ्गः<br>नारंगी</p></div>
+    <div class="feature-card" style="background:#9c27b0; color:white;"><p>जामुनः<br>जामुनी</p></div>
+    <div class="feature-card" style="background:#ff5722; color:white;"><p>सिन्दूरः<br>सिन्दूरी</p></div>
+    <div class="feature-card" style="background:#ffd700; color:#222;"><p>स्वर्णः<br>सुनहरा</p></div>
+    <div class="feature-card" style="background:#808080; color:white;"><p>धूम्रः<br>धूसर/ग्रे</p></div>
+    <div class="feature-card" style="background:#b87333; color:white;"><p>ताम्रः<br>तांबे का रंग</p></div>
+    <div class="feature-card" style="background:#b71c1c; color:white;"><p>रक्तवर्णः<br>गहरा लाल</p></div>
+    <div class="feature-card" style="background:#2e7d32; color:white;"><p>हरितवर्णः<br>गहरा हरा</p></div>
+    <div class="feature-card" style="background:#0d47a1; color:white;"><p>नीलवर्णः<br>गहरा नीला</p></div>
+    <div class="feature-card" style="background:#ffffff; color:#222; border:1px solid #ccc;"><p>श्वेतवर्णः<br>सफ़ेद</p></div>
+    <div class="feature-card" style="background:#ffb6c1; color:#222;"><p>कर्णिकः<br>हल्का लाल / गुलाबी</p></div>
+    <div class="feature-card" style="background:#87ceeb; color:#222;"><p>वातः<br>हल्का नीला</p></div>
+  </div>
+  <!-- Daily Word -->
+  <div class="card" id="dailyWord">
+    <h2>Daily Sanskrit Word</h2>
+    <p><span id="word"></span> - <span id="meaning"></span></p>
+  </div>
+
+  <!-- Counters -->
+  <div class="card" id="counters">
+    <div class="counters">
+      <div class="counter"><h3>100+</h3><p>Students Learned</p></div>
+      <div class="counter"><h3>150+</h3><p>Videos Uploaded</p></div>
+      <div class="counter"><h3>10+</h3><p>Certificates Issued</p></div>
+    </div>
+  </div>
+
+  <!-- Testimonials -->
+  <div class="card" id="testimonials">
+    <h2>Student Reviews</h2>
+    <div class="testimonials">
+      <div class="testimonial">"Amazing teaching! I understood Sanskrit in weeks." - Ananya</div>
+      <div class="testimonial">"Lessons are simple and fun. Highly recommended!" - Rahul</div>
+      <div class="testimonial">"The YouTube tutorials are very detailed and easy to follow." - Priya</div>
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <div class="card" id="contact">
+    <h2>Contact Us</h2>
+    <p>📧 Email: <a href="inforssanskrit@gmail.com">inforssanskrit@gmail.com</a></p>
+    <p>📱 Phone: +91-8922070245</p>
+    <form id="contactForm">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="email" id="email" placeholder="Your Email" required>
+      <textarea id="message" rows="4" placeholder="Your Message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+    <p id="welcomeMessage"></p>
+    <h3>Thank for your submission:</h3>
+    <ul id="studentList"></ul>
+  </div>
+
+</div>
+
+<footer>
+  <p>&copy; 2025 Rs Sanskrit Classes | All Rights Reserved</p>
+  <p>Follow us on <a href="https://www.youtube.com/@rssanskritclasses" target="_blank">YouTube</a></p>
+</footer>
+
+<script>
+// Loader
+window.addEventListener("load", function(){
+  document.getElementById("loader").style.display = "none";
+  document.getElementById("hero").classList.add("show");
+
+  // Animate cards on scroll
+  const elements = document.querySelectorAll('.card, .feature-card, .testimonial, #dailyWord, .counter');
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){ entry.target.classList.add('show'); }
+    });
+  }, { threshold:0.2 });
+  elements.forEach(el=>observer.observe(el));
+
+  // Load student list
+  loadStudents();
+
+  // Show welcome message if previously submitted
+  const savedName = localStorage.getItem("visitorName");
+  if(savedName){
+    document.getElementById("welcomeMessage").textContent =
+      "Welcome back, "+savedName+"! Thanks for contacting us earlier.";
+  }
+
+  // Daily Sanskrit Word
+  const words = [
+    { word: "नमस्ते", meaning: "Hello / Greetings" },
+    { word: "धन्यवाद", meaning: "Thank You" },
+    { word: "शुभप्रभात", meaning: "Good Morning" },
+    { word: "शुभरात्रि", meaning: "Good Night" },
+    { word: "सुखम्", meaning: "Happiness / Well-being" },
+    { word: "ज्ञानम्", meaning: "Knowledge" },
+    { word: "शांति", meaning: "Peace" },
+    { word: "सर्वेभ्यः", meaning: "To Everyone" },
+    { word: "मित्र", meaning: "Friend" },
+    { word: "शिक्षा", meaning: "Education" }
+  ];
+  const today = new Date();
+  const index = today.getDate() % words.length;
+  document.getElementById("word").textContent = words[index].word;
+  document.getElementById("meaning").textContent = words[index].meaning;
+});
+
+// Contact Form & Students List
+function loadStudents() {
+  const studentList = document.getElementById("studentList");
+  studentList.innerHTML = "";
+  let students = JSON.parse(localStorage.getItem("students")) || [];
+  students.forEach(s => {
+    const li = document.createElement("li");
+    li.textContent = `${s.name} (${s.email}): ${s.message}`;
+    studentList.appendChild(li);
+  });
+}
+
+document.getElementById("contactForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const message = document.getElementById("message").value;
+
+  let students = JSON.parse(localStorage.getItem("students")) || [];
+  students.push({ name, email, message });
+  localStorage.setItem("students", JSON.stringify(students));
+  localStorage.setItem("visitorName", name);
+
+  document.getElementById("welcomeMessage").textContent =
+    `Thank you, ${name}! Your message has been received.`;
+
+  this.reset();
+  loadStudents();
+});
+</script>
+
+</body>
+</html>
